@@ -1,0 +1,141 @@
+Target Platform: INstagram, Linkedin, Discord
+
+Linkedin :
+    length: 1200 - 700 chars
+    tone : professional,authoative, career centric.
+    hashtagcount: 3-5
+X:
+    Length: 280 chars
+    tone: opinioated, punchy. direct
+    hashtags 3-5
+Discord
+    Length: 200-1000
+    tone:Casual, Conversational, Commnity Driven
+    hashtags: 0
+
+==Project Structure==
+backend
+    cont
+==DATABASE==
+useruuid -> records of their posts
+
+
+===FLOW===
+Markdown or pasted URL ingest
+
+
+
+
+
+
+
+// Status Enums
+enum PostStatus {
+  DRAFT
+  PROCESSING
+  READY
+  ARCHIVED
+}
+
+enum VariantStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+  QUEUED
+  PUBLISHED
+  FAILED
+}
+
+enum SlotStatus {
+  EMPTY
+  RESERVED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum AttemptStatus {
+  SUCCESS
+  TRANSIENT_FAILURE
+  PERMANENT_FAILURE
+}
+
+enum Platform {
+  DISCORD
+  TELEGRAM
+  MASTODON
+  X_MOCK
+  LINKEDIN_MOCK
+}
+
+// 1. POST: Ingested source document (URL or Markdown)
+model Post {
+  id           String      @id @default(uuid())
+  title        String?
+  sourceType   String      // "URL" | "MARKDOWN"
+  rawContent   String      // Original raw content text
+  status       PostStatus  @default(DRAFT)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  variants     Variant[]
+}
+
+// 2. VARIANT: Platform-specific adaptation of a Post
+model Variant {
+  id              String         @id @default(uuid())
+  postId          String
+  post            Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  platform        Platform
+  content         String         // Constrained, platform-tailored text
+  hashtags        String[]
+  mediaUrls       String[]
+
+  // Review Status
+  status          VariantStatus  @default(DRAFT)
+  rejectionReason String?
+
+  slot            ScheduleSlot?  // Associated time slot if scheduled
+  attempts        PublishAttempt[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+// 3. SCHEDULE SLOT: Dedicated calendar window reserved for dispatch
+model ScheduleSlot {
+  id            String     @id @default(uuid())
+  variantId     String?    @unique
+  variant       Variant?   @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  platform      Platform   // Slot target channel
+  scheduledAt   DateTime   // Exact publishing timestamp
+  status        SlotStatus @default(EMPTY)
+
+  lockedAt      DateTime?  // Worker concurrency lock timestamp
+  lockedBy      String?    // Worker instance ID
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+// 4. PUBLISH ATTEMPT: Execution audit log (One Slot/Variant can have multiple attempts)
+model PublishAttempt {
+  id             String        @id @default(uuid())
+  variantId      String
+  variant        Variant       @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  attemptNumber  Int           // 1, 2, 3...
+  status         AttemptStatus
+
+  // External Provider Diagnostics
+  platformPostId String?       // ID returned by Discord/Telegram/Mock API
+  httpStatusCode Int?
+  errorMessage   String?
+  rawPayload     Json?         // Exact JSON sent to ISocialPublisher
+  rawResponse    Json?         // Provider's response
+
+  executedAt     DateTime      @default(now())
+  durationMs     Int           // Execution latency in ms
+}

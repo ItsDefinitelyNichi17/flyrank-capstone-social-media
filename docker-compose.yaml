@@ -1,0 +1,21 @@
+services:
+  # frontend:
+  #     build:
+  #       context: ./src/frontend
+  #       dockerfile: Dockerfile
+  #     ports:
+  #       - "5000:5000"
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+  db:
+    image: postgres:18
+    volumes:
+      - db_data:/var/lib/postgresql
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+volumes:
+  db_data:

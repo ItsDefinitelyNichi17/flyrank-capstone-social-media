@@ -8,11 +8,10 @@
   },
   "keywords": [],
   "type": "module",
-  "workspaces": [ "/src*"],
+  "workspaces": [
+    "src/*"
+  ],
   "dependencies": {
     "typescript": "^7.0.2"
-  },
-  "devDependencies": {
-    "tsx": "^4.23.12"
   }
 }
