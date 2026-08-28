@@ -5,9 +5,9 @@ dotenv.config({ path: "../.env" })
 
 const app = express();
 const port = process.env.DATABASE_URL ?? 3000
-
+console.log(process.env.DATABASE_URL)
 app.use(express.json());
 
 app.listen(port, () => {
-  console.log("app listens in port" + port)
+  console.log("app listens in port " + port)
 })
