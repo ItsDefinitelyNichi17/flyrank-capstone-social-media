@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXIST variants(
     hashtags TEXT[],
     platform platform,
     variant_content TEXT,
-    created_at TIMESTAMPT DEFAULT NOW(),
-    updated_at TIMESTAMPT DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 )

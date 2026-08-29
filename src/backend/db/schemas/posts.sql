@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS posts(
     title TEXT,
     source_type sourcetype,
     post_content TEXT,
-    created_at TIMESTAMPT DEFAULT NOW(),
-    updated_at TIMESTAMPT DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 )
