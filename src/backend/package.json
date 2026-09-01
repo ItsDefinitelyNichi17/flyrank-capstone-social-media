@@ -5,11 +5,12 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx -r dotenv/config app.ts"
+    "start": "tsx -r app.ts"
   },
   "keywords": [],
   "type": "module",
   "dependencies": {
+    "@google/genai": "^2.19.0",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
