@@ -5,7 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx -r app.ts"
+    "start": "tsx app.ts"
   },
   "keywords": [],
   "type": "module",
