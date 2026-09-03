@@ -1,5 +1,14 @@
 # BUILDLOG
 
+## **Variant Generation and Validation using LLM (Gemini API) \[Aug 2, 2026\]**
+* **Goal**:  
+  * To successfully generate and validate variants using an LLM (Gemini API).
+* **Challenges**:
+  * I struggled with structuring the codebase and implementing the constraints.
+  * Although the Gemini API provide the actual content, sometimes it generates less or much character than expected. Leading me to minimize the characters maximum and minimun constraint for each platform.
+* **Where AI came in (Gemini ChatBot)?**
+  * The AI helped me optimize the async calls on my "each variant genatator and validation function". My first attempt was calling them one by one asyncronously, but it feels unoptimized so I used it to help me refactor the code which at the end alsohelped me learn new things.
+
 ## **Store Markdown or URL \[Aug 30, 2026\]**
 * **Goal**: 
   * To successfully store the content of the markdown/URL provided by the user.
@@ -32,7 +41,7 @@
   * It helped me generate the ER model, what tables should be connected.
   * It also generated the fields for me, but I tweaked it a bit since some of the fields were unnecessary.
   * Problems on my postgres inside the docker, which was fixed by providing the right environments.
-  * Some help on planning the project structure.
+  * Helped on planning the project structure.
   * **INITIAL ER DIAGRAM**
     * ![ER_DIAG](./assets/er_diag.png)
       <br> *This was created within supabase*
