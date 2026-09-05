@@ -1,4 +1,4 @@
-import pool from "../../db/app"
+import pool from "../../db/app.js"
 import TurndownService from 'turndown'
 
 var turndownService = new TurndownService() // this service turns raw html as a markdown https://www.npmjs.com/package/turndown

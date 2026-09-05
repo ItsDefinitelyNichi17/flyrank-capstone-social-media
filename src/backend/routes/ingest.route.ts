@@ -1,5 +1,5 @@
 import Router from "express"
-import { ingestContent } from "../controller/ingest.controller"
+import { ingestContent } from "../controller/ingest.controller.js"
 
 const router = Router()
 

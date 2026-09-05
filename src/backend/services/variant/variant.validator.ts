@@ -1,4 +1,4 @@
-import { type platforms, type Constraint, constraint} from './variant.types.constraints'
+import { type platforms, type Constraint, constraint} from './variant.types.constraints.js'
 
 export function validateVariant(platformType: platforms, hashtagCount: number, content: string): boolean{
   const constraints = constraint[platformType]
