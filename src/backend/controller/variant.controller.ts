@@ -71,3 +71,6 @@ export async function updateVariantStatus(req: Request, res: Response) {
   }
 }
 
+export async function scheduleVariant() {
+
+}

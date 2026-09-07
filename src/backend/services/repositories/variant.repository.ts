@@ -7,7 +7,7 @@ export interface VariantQuery {
   platform: string
 }
 
-export const VALID_VARIANT_STATUSES = ["draft", "approved", "rejected"] as const;
+export const VALID_VARIANT_STATUSES = ["draft", "approved", "rejected", "published"] as const;
 export type VariantStatus = (typeof VALID_VARIANT_STATUSES)[number];
 
 export interface VariantRecord {
@@ -57,4 +57,21 @@ export async function setVariantStatus(id: string, status: VariantStatus, post_i
     [status, id]
   );
   return (q.rows[0] as VariantRecord | undefined) ?? null;
+}
+
+export async function checkScheduledVariants() {
+  const q = await pool.query(`
+    SELECT
+      schedule_slots.id AS slot_id,
+      schedule_slots.scheduled_at,
+      variants.id AS variant_id,
+      variants.platform,
+      variants.text
+    FROM schedule_slots
+    JOIN variants ON schedule_slots.variant_id = variants.id
+    WHERE variants.status = 'approved'
+      AND schedule_slots.scheduled_at <= NOW()
+      AND variants.status != 'published'
+    FOR UPDATE OF variants SKIP LOCKED;`);
+  return q.rows;
 }

@@ -18,6 +18,6 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'poststatus') THEN
-        CREATE TYPE poststatus AS ENUM ('draft', 'approved', 'rejected');
+        CREATE TYPE poststatus AS ENUM ('draft', 'approved', 'rejected', 'published');
     END IF;
 END $$;
