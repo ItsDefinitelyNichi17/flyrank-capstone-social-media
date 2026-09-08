@@ -6,7 +6,7 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'slotstate') THEN
-        CREATE TYPE slotstate AS ENUM ('queue', 'empty', 'complete', 'failed');
+        CREATE TYPE slotstate AS ENUM ('queue', 'complete', 'failed');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'platform') THEN

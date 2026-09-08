@@ -1,12 +1,11 @@
 import Router from "express"
-import type { Request, Response } from "express"
-import { updateVariantStatus } from "../controller/variant.controller.js"
+import { scheduleVariantController, updateVariantStatusController, getAllVariantsController } from "../controller/variant.controller.js"
+
+
 const router = Router()
 
-router.get('/', (req : Request , res : Response) => {
-  res.send('get all posts')
-})
-
-router.patch('/:id', updateVariantStatus)
+router.get('/', getAllVariantsController)
+router.patch('/status/:variantId', updateVariantStatusController)
+router.post('/schedule/:variantId', scheduleVariantController)
 
 export default router

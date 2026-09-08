@@ -32,11 +32,6 @@ export async function storeVariant(post_id: string[], hashtags: string[][], vari
   )
 }
 
-export async function getVariants(id: string) {
-  const q = await pool.query(`SELECT * FROM variants WHERE post_id = $1`, [id])
-  return q.rows;
-}
-
 export async function setVariantStatus(id: string, status: VariantStatus, post_id?: string) {
   if (post_id) {
     const q = await pool.query(
@@ -68,10 +63,32 @@ export async function checkScheduledVariants() {
       variants.platform,
       variants.text
     FROM schedule_slots
-    JOIN variants ON schedule_slots.variant_id = variants.id
+    JOIN variants
+      ON schedule_slots.variant_id = variants.id
     WHERE variants.status = 'approved'
       AND schedule_slots.scheduled_at <= NOW()
       AND variants.status != 'published'
     FOR UPDATE OF variants SKIP LOCKED;`);
   return q.rows;
+}
+
+
+export async function scheduleVariant(variantId: string, scheduled_at: Date) {
+  const q = await pool.query(
+    `INSERT INTO schedule_slots (variant_id, schedule_slot)
+    VALUES ($1, $2)
+    RETURNING *`,
+    [variantId, scheduled_at]
+  )
+  return q.rows[0]
+}
+
+export async function getVariant(id: string): Promise<VariantRecord | undefined> {
+  const q = await pool.query(`SELECT * FROM variants WHERE id = $1`, [id])
+  return q.rows[0] as VariantRecord | undefined;
+}
+
+export async function getAllVariants(): Promise<VariantRecord[]> {
+  const q = await pool.query(`SELECT * FROM variants`)
+  return q.rows as VariantRecord[];
 }
