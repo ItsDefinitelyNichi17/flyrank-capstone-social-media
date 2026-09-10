@@ -21,6 +21,7 @@ export interface VariantRecord {
   updated_at: Date;
 }
 
+/* Stores a variant in the database*/
 export async function storeVariant(post_id: string[], hashtags: string[][], variant_content: string[], platform: string[]) {
   const formattedHashtags = hashtags.map((tags) => tags.join(','));
   console.log(post_id, variant_content, formattedHashtags, platform)
@@ -32,6 +33,7 @@ export async function storeVariant(post_id: string[], hashtags: string[][], vari
   )
 }
 
+// Updates the review status of the variant
 export async function setVariantStatus(id: string, status: VariantStatus, post_id?: string) {
   if (post_id) {
     const q = await pool.query(
@@ -72,17 +74,23 @@ export async function checkScheduledVariants() {
   return q.rows;
 }
 
-
+// Schedule the variant 1 variant 1 schedule slot. If the slot already exists, update it.
 export async function scheduleVariant(variantId: string, scheduled_at: Date) {
   const q = await pool.query(
-    `INSERT INTO schedule_slots (variant_id, schedule_slot)
-    VALUES ($1, $2)
+    `INSERT INTO schedule_slots (variant_id, scheduled_at, state)
+    VALUES ($1, $2, 'queue')
+    ON CONFLICT (variant_id)
+    DO UPDATE SET
+      scheduled_at = EXCLUDED.scheduled_at,
+      state = 'queue'
+    WHERE schedule_slots.state != 'complete'
     RETURNING *`,
     [variantId, scheduled_at]
   )
   return q.rows[0]
 }
 
+// get specifc variant by the id
 export async function getVariant(id: string): Promise<VariantRecord | undefined> {
   const q = await pool.query(`SELECT * FROM variants WHERE id = $1`, [id])
   return q.rows[0] as VariantRecord | undefined;

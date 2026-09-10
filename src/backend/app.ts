@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use('/ingest', IngestRoute);
 app.use('/articles', ArticleRoute);
-app.use('/variants', VariantRoutes);
+app.use('/variant', VariantRoutes);
 app.listen(port, () => {
   console.log("app listens in port " + port)
 })
