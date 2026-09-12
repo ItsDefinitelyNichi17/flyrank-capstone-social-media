@@ -5,15 +5,19 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx app.ts"
+    "start": "tsx app.ts",
+    "test:worker": "tsx services/bullmq/variant.worker.ts",
+    "test:main": "tsx services/bullmq/main.ts"
   },
   "keywords": [],
   "type": "module",
   "dependencies": {
     "@google/genai": "^2.19.0",
+    "bullmq": "^6.3.4",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "ioredis": "^6.0.0",
     "pg": "^8.23.0",
     "turndown": "^7.2.4"
   },

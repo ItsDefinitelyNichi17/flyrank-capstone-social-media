@@ -4,7 +4,7 @@ import {
   type VariantStatus, getAllVariants
 }
   from "../services/repositories/variant.repository.js";
-
+import { scheduleJob } from "../services/bullmq/variant.queue.js";
 export { VALID_VARIANT_STATUSES, type VariantStatus };
 
 const UUID_REGEX =
@@ -95,11 +95,17 @@ export async function scheduleVariantController(req: Request, res: Response) {
   }
 
   if (scheduled_at < new Date()) {
+    console.log(scheduled_at, new Date())
     return res.status(400).json({message: "Schedule time should be in the future"});
   }
   // schedule logic
   try {
     const scheduledVariant = await scheduleVariant(variantId, scheduled_at);
+    if (scheduledVariant) {
+      const ms = Math.max(0, new Date(scheduled_at).getTime() - Date.now());
+      console.log(ms);
+      await scheduleJob(ms, variantId, scheduledVariant.id);
+    }
     return res.status(200).json({
       message: "Variant scheduled successfully",
       variant: scheduledVariant,
