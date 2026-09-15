@@ -75,19 +75,48 @@ export async function checkScheduledVariants() {
 }
 
 // Schedule the variant 1 variant 1 schedule slot. If the slot already exists, update it.
-export async function scheduleVariant(variantId: string, scheduled_at: Date) {
-  const q = await pool.query(
-    `INSERT INTO schedule_slots (variant_id, scheduled_at, state)
-    VALUES ($1, $2, 'queue')
-    ON CONFLICT (variant_id)
-    DO UPDATE SET
-      scheduled_at = EXCLUDED.scheduled_at,
-      state = 'queue'
-    WHERE schedule_slots.state != 'complete'
-    RETURNING *`,
-    [variantId, scheduled_at]
-  )
-  return q.rows[0]
+export async function insertScheduleVariant(variantId: string, scheduled_at: Date) {
+  try {
+    const q = await pool.query(
+      `INSERT INTO schedule_slots (variant_id, scheduled_at, state)
+      VALUES ($1, $2, 'queue')
+      ON CONFLICT (variant_id)
+      DO UPDATE SET
+        scheduled_at = EXCLUDED.scheduled_at,
+        state = 'queue'
+      -- WHERE schedule_slots.state != 'complete'
+      RETURNING *`,
+      [variantId, scheduled_at]
+    );
+    console.log(q.rows[0]);
+    return q.rows[0]
+  } catch (e){
+    if (e instanceof Error) {
+      console.log(e.message)
+      throw e;
+    }
+  }
+
+}
+
+export async function updateVariantState(variantId: string, state: string) {
+  try {
+    console.log("variantId: ", variantId, "state: ", state)
+    const q = await pool.query(
+      `UPDATE schedule_slots
+      SET state = $2
+      WHERE variant_id = $1
+      RETURNING *`,
+      [variantId, state]
+    )
+    return q.rows[0]
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message)
+      throw error
+    }
+  }
+
 }
 
 // get specifc variant by the id

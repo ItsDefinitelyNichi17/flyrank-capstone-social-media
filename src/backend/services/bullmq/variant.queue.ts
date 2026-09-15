@@ -10,6 +10,17 @@ const variantQueue = new Queue(
   { connection: redisConnection }
 );
 
-export async function scheduleJob(ms: number, variantId: string, slotId: string) {
-  await variantQueue.add("publish-variant", { variant_id: variantId, slot_id: slotId }, { delay: ms })
+export async function scheduleJob(ms: number, variantId: string, slotId: string, variant_content: string) {
+  try {
+    const queue = await variantQueue.add("publish-variant",
+      { variant_id: variantId, slot_id: slotId, variant_content },
+      { delay: ms, removeOnComplete: true, removeOnFail: { count: 20 } })
+    console.log('Job added to queue')
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message)
+      throw e
+    }
+  }
+
 }

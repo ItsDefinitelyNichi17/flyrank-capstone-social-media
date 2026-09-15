@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
-import {
-  scheduleVariant, getVariant, setVariantStatus, VALID_VARIANT_STATUSES,
+import { insertScheduleVariant, getVariant, setVariantStatus, VALID_VARIANT_STATUSES,
   type VariantStatus, getAllVariants
 }
   from "../services/repositories/variant.repository.js";
@@ -74,7 +73,6 @@ export async function updateVariantStatusController(req: Request, res: Response)
 export async function scheduleVariantController(req: Request, res: Response) {
   const { variantId } = req.params;
   const { schedule } = req.body;
-
   const scheduled_at = new Date(schedule);
   //safety checks
   if (!variantId || !schedule) {
@@ -84,28 +82,28 @@ export async function scheduleVariantController(req: Request, res: Response) {
     return res.status(400).json({ error: "Invalid 'id' in request params" });
   }
 
-  const variantExists = await getVariant(variantId);
+  const variant = await getVariant(variantId);
 
-  if (!variantExists) {
+  if (!variant) {
     return res.status(404).json({ error: `Variant with ID '${variantId}' not found` });
   }
 
-  if (!(variantExists.status === "approved")) {
+  if (!(variant.status === "approved")) {
     return res.status(400).json({message: "Variant is not approved"});
   }
 
   if (scheduled_at < new Date()) {
-    console.log(scheduled_at, new Date())
     return res.status(400).json({message: "Schedule time should be in the future"});
   }
   // schedule logic
   try {
-    const scheduledVariant = await scheduleVariant(variantId, scheduled_at);
+    const scheduledVariant = await insertScheduleVariant(variantId, scheduled_at);
     if (scheduledVariant) {
       const ms = Math.max(0, new Date(scheduled_at).getTime() - Date.now());
-      console.log(ms);
-      await scheduleJob(ms, variantId, scheduledVariant.id);
+      const job = await scheduleJob(ms, variantId, scheduledVariant.id, variant.variant_content);
+      console.log(job)
     }
+
     return res.status(200).json({
       message: "Variant scheduled successfully",
       variant: scheduledVariant,

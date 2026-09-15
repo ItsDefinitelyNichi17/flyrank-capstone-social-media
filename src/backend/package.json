@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsx app.ts",
     "test:worker": "tsx services/bullmq/variant.worker.ts",
-    "test:main": "tsx services/bullmq/main.ts"
+    "test:main": "tsx services/bullmq/main.ts",
+    "test:pub": "tsx services/publisher/publisher.ts"
   },
   "keywords": [],
   "type": "module",

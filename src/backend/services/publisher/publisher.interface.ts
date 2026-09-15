@@ -8,7 +8,6 @@ export interface PublishPayload{
 //output
 export interface PublishResult {
   success: boolean;
-  externalPostId?: string;
   errorMessage?: string;
 }
 
