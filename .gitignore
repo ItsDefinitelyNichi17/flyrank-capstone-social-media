@@ -1,3 +1,5 @@
 /node_modules
 note.txt
 .env
+tasks.txt
+discord-test.ts

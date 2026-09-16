@@ -1,10 +1,9 @@
 import type { Request, Response } from "express";
-import {
-  setVariantStatus,
-  VALID_VARIANT_STATUSES,
-  type VariantStatus,
-} from "../services/repositories/variant.repository.js";
-
+import { insertScheduleVariant, getVariant, setVariantStatus, VALID_VARIANT_STATUSES,
+  type VariantStatus, getAllVariants
+}
+  from "../services/repositories/variant.repository.js";
+import { scheduleJob } from "../services/bullmq/variant.queue.js";
 export { VALID_VARIANT_STATUSES, type VariantStatus };
 
 const UUID_REGEX =
@@ -15,16 +14,16 @@ const UUID_REGEX =
  * Complies with the 'poststatus' enum ('draft', 'approved', 'rejected')
  * defined in src/backend/db/schemas/variants.sql and types.sql.
  */
-export async function updateVariantStatus(req: Request, res: Response) {
+export async function updateVariantStatusController(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const { variantId } = req.params;
     const { status, post_id } = req.body;
 
-    if (!id || typeof id !== "string" || !id.trim()) {
+    if (!variantId || typeof variantId !== "string" || !variantId.trim()) {
       return res.status(400).json({ error: "Variant ID is required" });
     }
 
-    const trimmedId = id.trim();
+    const trimmedId = variantId.trim();
     if (!UUID_REGEX.test(trimmedId)) {
       return res
         .status(400)
@@ -71,6 +70,56 @@ export async function updateVariantStatus(req: Request, res: Response) {
   }
 }
 
-export async function scheduleVariant() {
+export async function scheduleVariantController(req: Request, res: Response) {
+  const { variantId } = req.params;
+  const { schedule } = req.body;
+  const scheduled_at = new Date(schedule);
+  //safety checks
+  if (!variantId || !schedule) {
+    return res.status(400).json({ error: "Missing 'id' in request params or 'schedule' in request body" });
+  }
+  if (!(typeof variantId === 'string')) {
+    return res.status(400).json({ error: "Invalid 'id' in request params" });
+  }
 
+  const variant = await getVariant(variantId);
+
+  if (!variant) {
+    return res.status(404).json({ error: `Variant with ID '${variantId}' not found` });
+  }
+
+  if (!(variant.status === "approved")) {
+    return res.status(400).json({message: "Variant is not approved"});
+  }
+
+  if (scheduled_at < new Date()) {
+    return res.status(400).json({message: "Schedule time should be in the future"});
+  }
+  // schedule logic
+  try {
+    const scheduledVariant = await insertScheduleVariant(variantId, scheduled_at);
+    if (scheduledVariant) {
+      const ms = Math.max(0, new Date(scheduled_at).getTime() - Date.now());
+      const job = await scheduleJob(ms, variantId, scheduledVariant.id, variant.variant_content);
+      console.log(job)
+    }
+
+    return res.status(200).json({
+      message: "Variant scheduled successfully",
+      variant: scheduledVariant,
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+}
+
+export async function getAllVariantsController(req: Request, res: Response) {
+  const variants = await getAllVariants();
+  res.status(200).json({
+    message: "Variants retrieved successfully",
+    variants: variants
+  });
+  return
 }
