@@ -1,21 +1,25 @@
 import { Job, Worker } from 'bullmq';
 import { redisConnection } from './variant.queue.js';
 import { updateVariantState } from '../repositories/variant.repository.js';
-import { DiscordPublisher } from '../publisher/publisher.js';
+import { publisherManager } from '../publisher/publisher.js';
 
 interface PublishedVariant {
   variant_id: string;
   slot_id: string;
   variant_content: string;
+  platformName: string;
 }
 
-const variantQueue = new Worker(
+const worker = new Worker(
   'variantQueue',
   async (job: Job<PublishedVariant>) => {
-    console.log("publishing..")
+    const platformName = job.data.platformName;
     try {
-      const publisher = new DiscordPublisher();
-      await publisher.publish({ variantId: job.data.variant_id, content: job.data.variant_content })
+      const publishManager = publisherManager(platformName)
+      if (!publishManager) {
+        throw new Error(`No publisher found for platform: ${platformName}`)
+      }
+      await publishManager.publish({ variantId: job.data.variant_id, content: job.data.variant_content })
       const q = await updateVariantState(job.data.variant_id, "complete");
       console.log("published")
     } catch (e) {
@@ -29,4 +33,4 @@ const variantQueue = new Worker(
   { connection: redisConnection, }
 );
 
-export {variantQueue};
+export default worker;

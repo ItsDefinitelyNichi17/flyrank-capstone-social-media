@@ -1,5 +1,5 @@
 import type { Response, Request } from "express";
-import { storePost } from "../services/repositories/ingest.repository.js";
+import { storePost } from "../services/repositories/post.repository.js";
 import { genEachVarStore } from "../services/variant/variant.gen.js";
 import { storeVariant } from "../services/repositories/variant.repository.js";
 

@@ -7,6 +7,15 @@ export interface VariantQuery {
   platform: string
 }
 
+export interface VariantScheduleSlot {
+  id : string,
+  variant_id : string,
+  scheduled_at : Date,
+  state : string,
+  created_at : Date,
+  updated_at : Date
+}
+
 export const VALID_VARIANT_STATUSES = ["draft", "approved", "rejected", "published"] as const;
 export type VariantStatus = (typeof VALID_VARIANT_STATUSES)[number];
 
@@ -21,10 +30,9 @@ export interface VariantRecord {
   updated_at: Date;
 }
 
-/* Stores a variant in the database*/
+/* Stores a variant in the database */
 export async function storeVariant(post_id: string[], hashtags: string[][], variant_content: string[], platform: string[]) {
   const formattedHashtags = hashtags.map((tags) => tags.join(','));
-  console.log(post_id, variant_content, formattedHashtags, platform)
   const q = await pool.query(
     `INSERT INTO variants(post_id, hashtags, variant_content, platform) \
     SELECT * FROM UNNEST(
@@ -128,4 +136,9 @@ export async function getVariant(id: string): Promise<VariantRecord | undefined>
 export async function getAllVariants(): Promise<VariantRecord[]> {
   const q = await pool.query(`SELECT * FROM variants`)
   return q.rows as VariantRecord[];
+}
+
+export async function getAllVariantScheduleSlots() : Promise<VariantScheduleSlot[]> {
+  const q = await pool.query('SELECT * FROM schedule_slots')
+  return q.rows as VariantScheduleSlot[]
 }

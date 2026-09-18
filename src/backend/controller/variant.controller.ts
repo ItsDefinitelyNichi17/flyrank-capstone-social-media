@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { insertScheduleVariant, getVariant, setVariantStatus, VALID_VARIANT_STATUSES,
-  type VariantStatus, getAllVariants
+  type VariantStatus, getAllVariants, getAllVariantScheduleSlots
 }
   from "../services/repositories/variant.repository.js";
 import { scheduleJob } from "../services/bullmq/variant.queue.js";
@@ -82,7 +82,7 @@ export async function scheduleVariantController(req: Request, res: Response) {
     return res.status(400).json({ error: "Invalid 'id' in request params" });
   }
 
-  const variant = await getVariant(variantId);
+  const variant = await getVariant(variantId);  //check if variant exists
 
   if (!variant) {
     return res.status(404).json({ error: `Variant with ID '${variantId}' not found` });
@@ -100,8 +100,7 @@ export async function scheduleVariantController(req: Request, res: Response) {
     const scheduledVariant = await insertScheduleVariant(variantId, scheduled_at);
     if (scheduledVariant) {
       const ms = Math.max(0, new Date(scheduled_at).getTime() - Date.now());
-      const job = await scheduleJob(ms, variantId, scheduledVariant.id, variant.variant_content);
-      console.log(job)
+      const job = await scheduleJob(ms, variantId, scheduledVariant.id, variant.variant_content, variant.platform);
     }
 
     return res.status(200).json({
@@ -120,6 +119,14 @@ export async function getAllVariantsController(req: Request, res: Response) {
   res.status(200).json({
     message: "Variants retrieved successfully",
     variants: variants
+  });
+  return
+}
+
+export async function getAllVariantsScheduledController(req: Request, res: Response) {
+  const schedule_slots = await getAllVariantScheduleSlots();
+  res.status(200).json({
+    slot: schedule_slots
   });
   return
 }
