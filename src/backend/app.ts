@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express'
-import IngestRoute from './routes/ingest.route.js'
+import IngestRoute from './routes/post.route.js'
 import ArticleRoute from './routes/article.route.js'
 import VariantRoutes from './routes/variant.route.js'
 import worker from './services/bullmq/variant.worker.js';

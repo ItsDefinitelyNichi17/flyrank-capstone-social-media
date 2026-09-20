@@ -5,7 +5,7 @@ import { storeVariant } from "../services/repositories/variant.repository.js";
 
 
 
-export async function ingestContent(req : Request, res: Response) {
+export async function ingestPost(req : Request, res: Response) {
   const { content } = req.body;
   if (isURL(content)) {
     const page_res = await fetch(content);

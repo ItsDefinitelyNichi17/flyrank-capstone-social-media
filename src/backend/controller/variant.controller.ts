@@ -1,8 +1,7 @@
 import type { Request, Response } from "express";
-import { insertScheduleVariant, getVariant, setVariantStatus, VALID_VARIANT_STATUSES,
-  type VariantStatus, getAllVariants, getAllVariantScheduleSlots
-}
+import { getVariant, setVariantStatus, VALID_VARIANT_STATUSES, type VariantStatus, getAllVariants }
   from "../services/repositories/variant.repository.js";
+import { insertScheduleVariant, getAllVariantScheduleSlots } from "../services/repositories/schedule_slots.repository.js";
 import { scheduleJob } from "../services/bullmq/variant.queue.js";
 export { VALID_VARIANT_STATUSES, type VariantStatus };
 
@@ -88,17 +87,25 @@ export async function scheduleVariantController(req: Request, res: Response) {
     return res.status(404).json({ error: `Variant with ID '${variantId}' not found` });
   }
 
+  if (variant.status === "published") {
+    return res.status(400).json({ message: "Variant is already published" });
+  }
+
   if (!(variant.status === "approved")) {
-    return res.status(400).json({message: "Variant is not approved"});
+    return res.status(400).json({ message: "Variant is not approved" });
   }
 
   if (scheduled_at < new Date()) {
-    return res.status(400).json({message: "Schedule time should be in the future"});
+    return res.status(400).json({ message: "Schedule time should be in the future" });
   }
+
   // schedule logic
   try {
     const scheduledVariant = await insertScheduleVariant(variantId, scheduled_at);
     if (scheduledVariant) {
+      if (scheduledVariant.state === "published") {
+        return res.status(400).json({ message: "Variant slot is already published" });
+      }
       const ms = Math.max(0, new Date(scheduled_at).getTime() - Date.now());
       const job = await scheduleJob(ms, variantId, scheduledVariant.id, variant.variant_content, variant.platform);
     }

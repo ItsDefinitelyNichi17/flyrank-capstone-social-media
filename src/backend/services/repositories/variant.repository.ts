@@ -1,20 +1,5 @@
 import pool from "../../db/app.js"
 
-export interface VariantQuery {
-  post_id: string
-  hashtags: string[]
-  variant_content: string
-  platform: string
-}
-
-export interface VariantScheduleSlot {
-  id : string,
-  variant_id : string,
-  scheduled_at : Date,
-  state : string,
-  created_at : Date,
-  updated_at : Date
-}
 
 export const VALID_VARIANT_STATUSES = ["draft", "approved", "rejected", "published"] as const;
 export type VariantStatus = (typeof VALID_VARIANT_STATUSES)[number];
@@ -64,69 +49,6 @@ export async function setVariantStatus(id: string, status: VariantStatus, post_i
   return (q.rows[0] as VariantRecord | undefined) ?? null;
 }
 
-export async function checkScheduledVariants() {
-  const q = await pool.query(`
-    SELECT
-      schedule_slots.id AS slot_id,
-      schedule_slots.scheduled_at,
-      variants.id AS variant_id,
-      variants.platform,
-      variants.text
-    FROM schedule_slots
-    JOIN variants
-      ON schedule_slots.variant_id = variants.id
-    WHERE variants.status = 'approved'
-      AND schedule_slots.scheduled_at <= NOW()
-      AND variants.status != 'published'
-    FOR UPDATE OF variants SKIP LOCKED;`);
-  return q.rows;
-}
-
-// Schedule the variant 1 variant 1 schedule slot. If the slot already exists, update it.
-export async function insertScheduleVariant(variantId: string, scheduled_at: Date) {
-  try {
-    const q = await pool.query(
-      `INSERT INTO schedule_slots (variant_id, scheduled_at, state)
-      VALUES ($1, $2, 'queue')
-      ON CONFLICT (variant_id)
-      DO UPDATE SET
-        scheduled_at = EXCLUDED.scheduled_at,
-        state = 'queue'
-      -- WHERE schedule_slots.state != 'complete'
-      RETURNING *`,
-      [variantId, scheduled_at]
-    );
-    console.log(q.rows[0]);
-    return q.rows[0]
-  } catch (e){
-    if (e instanceof Error) {
-      console.log(e.message)
-      throw e;
-    }
-  }
-
-}
-
-export async function updateVariantState(variantId: string, state: string) {
-  try {
-    console.log("variantId: ", variantId, "state: ", state)
-    const q = await pool.query(
-      `UPDATE schedule_slots
-      SET state = $2
-      WHERE variant_id = $1
-      RETURNING *`,
-      [variantId, state]
-    )
-    return q.rows[0]
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message)
-      throw error
-    }
-  }
-
-}
-
 // get specifc variant by the id
 export async function getVariant(id: string): Promise<VariantRecord | undefined> {
   const q = await pool.query(`SELECT * FROM variants WHERE id = $1`, [id])
@@ -136,9 +58,4 @@ export async function getVariant(id: string): Promise<VariantRecord | undefined>
 export async function getAllVariants(): Promise<VariantRecord[]> {
   const q = await pool.query(`SELECT * FROM variants`)
   return q.rows as VariantRecord[];
-}
-
-export async function getAllVariantScheduleSlots() : Promise<VariantScheduleSlot[]> {
-  const q = await pool.query('SELECT * FROM schedule_slots')
-  return q.rows as VariantScheduleSlot[]
 }
