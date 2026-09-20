@@ -1,32 +1,59 @@
 import { Job, Worker } from 'bullmq';
 import { redisConnection } from './variant.queue.js';
-import { updateVariantState } from '../repositories/variant.repository.js';
-import { DiscordPublisher } from '../publisher/publisher.js';
+import { updateVariantState } from '../repositories/schedule_slots.repository.js';
+import { publisherManager } from '../publisher/publisher.js';
 
 interface PublishedVariant {
   variant_id: string;
-  slot_id: string;
+  slot_id?: string;
+  sched_id?: string;
   variant_content: string;
+  platformName: string;
 }
 
-const variantQueue = new Worker(
+export async function processVariantJob(data: PublishedVariant) {
+  const platformName = data.platformName;
+  const variantId = data.variant_id;
+  const slotId = data.slot_id || data.sched_id;
+
+  const publishManager = publisherManager(platformName);
+  if (!publishManager) {
+    throw new Error(`Failed to Publish: No publisher found for platform: ${platformName}`);
+  }
+
+  const publish = await publishManager.publish({
+    variantId ,
+    slotId,
+    content: data.variant_content,
+  });
+
+  if (!publish.success) {
+    if (publish.alreadyPublished || publish.errorMessage === 'Attempt already successful') {
+      console.log(`Variant ${variantId} (slot: ${slotId}) was already published. Skipping duplicate post.`);
+      return { skipped: true, alreadyPublished: true };
+    }
+    await updateVariantState(variantId, "failed", publish.errorMessage);
+    throw new Error(publish.errorMessage);
+  }
+
+  await updateVariantState(variantId, "published");
+  console.log(`Successfully published variant ${variantId} for slot ${slotId}`);
+  return { success: true };
+}
+
+const worker = new Worker(
   'variantQueue',
   async (job: Job<PublishedVariant>) => {
-    console.log("publishing..")
     try {
-      const publisher = new DiscordPublisher();
-      await publisher.publish({ variantId: job.data.variant_id, content: job.data.variant_content })
-      const q = await updateVariantState(job.data.variant_id, "complete");
-      console.log("published")
+      await processVariantJob(job.data);
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message)
-        throw e
+        console.error(`Worker error for variant ${job.data.variant_id}: ${e.message}`);
       }
-      return;
+      throw e;
     }
   },
-  { connection: redisConnection, }
+  { connection: redisConnection }
 );
 
-export {variantQueue};
+export default worker;

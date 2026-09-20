@@ -1,11 +1,11 @@
 import type { Response, Request } from "express";
-import { storePost } from "../services/repositories/ingest.repository.js";
+import { storePost } from "../services/repositories/post.repository.js";
 import { genEachVarStore } from "../services/variant/variant.gen.js";
 import { storeVariant } from "../services/repositories/variant.repository.js";
 
 
 
-export async function ingestContent(req : Request, res: Response) {
+export async function ingestPost(req : Request, res: Response) {
   const { content } = req.body;
   if (isURL(content)) {
     const page_res = await fetch(content);
