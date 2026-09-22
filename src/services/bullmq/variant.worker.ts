@@ -1,7 +1,8 @@
 import { Job, Worker } from 'bullmq';
-import { redisConnection } from './variant.queue.js';
 import { updateVariantState } from '../repositories/schedule_slots.repository.js';
 import { publisherManager } from '../publisher/publisher.js';
+import fs from 'fs';
+import path from 'path';
 
 interface PublishedVariant {
   variant_id: string;
@@ -41,11 +42,13 @@ export async function processVariantJob(data: PublishedVariant) {
   return { success: true };
 }
 
+
 const worker = new Worker(
   'variantQueue',
   async (job: Job<PublishedVariant>) => {
     try {
       await processVariantJob(job.data);
+
     } catch (e) {
       if (e instanceof Error) {
         console.error(`Worker error for variant ${job.data.variant_id}: ${e.message}`);
@@ -53,7 +56,7 @@ const worker = new Worker(
       throw e;
     }
   },
-  { connection: redisConnection }
+  { connection: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) || 6379 } }
 );
 
 export default worker;

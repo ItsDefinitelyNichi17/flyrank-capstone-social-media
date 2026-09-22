@@ -1,5 +1,6 @@
 import { type platforms, type Constraint, constraint} from './variant.types.constraints.js'
 
+
 export function validateVariant(platformType: platforms, hashtagCount: number, content: string): boolean{
   const constraints = constraint[platformType]
   // console.log("Length of text: " + content.length + " (min: " + constraints.length_min + ", max: " + constraints.length_max + ")")

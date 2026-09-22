@@ -9,9 +9,6 @@
   },
   "keywords": [],
   "type": "module",
-  "workspaces": [
-    "src/*"
-  ],
   "dependencies": {
     "typescript": "^7.0.2"
   }

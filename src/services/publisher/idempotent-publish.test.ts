@@ -1,4 +1,4 @@
-import test, { describe, it, before, after } from 'node:test';
+import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import pool from '../../db/app.js';
 import { MockPublisher } from './publisher.js';
@@ -174,9 +174,9 @@ describe('Idempotent Publish - schedule_slots schema only', () => {
   it('verifies idempotency is enforced strictly under schedule_slots schema without creating any new table', async () => {
     // Check tables in postgres
     const { rows } = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
       ORDER BY table_name;
     `);
     const tableNames = rows.map((r) => r.table_name);
@@ -184,8 +184,8 @@ describe('Idempotent Publish - schedule_slots schema only', () => {
 
     // Verify schedule_slots exists and contains the expected columns
     const { rows: columns } = await pool.query(`
-      SELECT column_name, data_type 
-      FROM information_schema.columns 
+      SELECT column_name, data_type
+      FROM information_schema.columns
       WHERE table_name = 'schedule_slots'
       ORDER BY ordinal_position;
     `);

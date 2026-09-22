@@ -25,6 +25,7 @@ export async function generateVariant(platform: platforms, content: string)
     : Promise<VarianObject | undefined>{
   const Obj: Constraint = constraint[platform]
   try {
+
     const interaction = await ai.interactions.create({
       model: "gemini-3.5-flash-lite",
       input: `Generate a ${platform} campaigh post/caption for "${content}" markdown.
@@ -32,9 +33,12 @@ export async function generateVariant(platform: platforms, content: string)
         min-characters ${Obj.length_min},
         max-characters ${Obj.length_max},
         tone ${Obj.tone},
+
         hashstag-min ${Obj.hashtag_min},
         hashstag-max ${Obj.hashtag_max}. Return it as a json dont wrap it on \`\`\` block{content, hashtag[]}.`,
-    })
+    },
+    { signal: AbortSignal.timeout(60000) }
+    )
     const interactionObj= JSON.parse(interaction.output_text as string);
 
     return { ...interactionObj, platform };

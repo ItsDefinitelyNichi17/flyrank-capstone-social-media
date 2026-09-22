@@ -1,14 +1,8 @@
 import { Queue } from 'bullmq';
-import { checkAttempt } from '../repositories/attempts.repository.js';
-
-export const redisConnection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: Number(process.env.REDIS_PORT) || 6379,
-};
 
 const variantQueue = new Queue(
   'variantQueue',
-  { connection: redisConnection }
+  { connection: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) || 6379 } }
 );
 
 export async function scheduleJob(
@@ -48,4 +42,3 @@ export async function scheduleJob(
     }
   }
 }
-

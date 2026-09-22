@@ -1,0 +1,20 @@
+[{
+  "data": {
+    "variant_id": "72046875-4950-4322-8628-596623608618",
+    "slot_id": "95105b14-9f11-4a4e-a7e9-f246d9d15280",
+    "sched_id": "95105b14-9f11-4a4e-a7e9-f246d9d15280",
+    "variant_content": "Unlock your true professional potential today. Discover essential strategies to accelerate career growth and lead with confidence in your industry."
+  },
+  "success": true,
+  "date": "2026-09-22T15:00:30.101Z"
+},
+{
+  "data": {
+    "variant_id": "72046875-4950-4322-8628-596623608618",
+    "slot_id": "95105b14-9f11-4a4e-a7e9-f246d9d15280",
+    "sched_id": "95105b14-9f11-4a4e-a7e9-f246d9d15280",
+    "variant_content": "Unlock your true professional potential today. Discover essential strategies to accelerate career growth and lead with confidence in your industry."
+  },
+  "success": true,
+  "date": "2026-09-22T15:13:20.121Z"
+}]
