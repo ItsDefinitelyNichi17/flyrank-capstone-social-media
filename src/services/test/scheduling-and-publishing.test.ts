@@ -63,7 +63,7 @@ describe('scheduling and publishing boundaries', () => {
   });
 
   test('blocked variant: refuses scheduling a variant that has not been approved', async () => {
-    getVariant.mockResolvedValue({ ...approvedVariant, status: 'rejected' });
+    getVariant.mockResolvedValue({ ...approvedVariant, status: 'rejected' } as never);
     const response = responseDouble();
 
     await scheduleVariantController(
@@ -78,7 +78,7 @@ describe('scheduling and publishing boundaries', () => {
   });
 
   test('refused schedule: rejects a past time without inserting a slot or queueing work', async () => {
-    getVariant.mockResolvedValue(approvedVariant);
+    getVariant.mockResolvedValue(approvedVariant as never);
     const response = responseDouble();
 
     await scheduleVariantController(
@@ -98,7 +98,7 @@ describe('scheduling and publishing boundaries', () => {
         success: false,
         alreadyPublished: true,
         errorMessage: 'Attempt already successful',
-      }),
+      } as never),
     });
 
     await expect(processVariantJob({
@@ -112,8 +112,8 @@ describe('scheduling and publishing boundaries', () => {
   });
 
   test('adapter swap: chooses the adapter for each job platform and preserves its payload', async () => {
-    const discordAdapter = { publish: jest.fn().mockResolvedValue({ success: true }) };
-    const linkedinAdapter = { publish: jest.fn().mockResolvedValue({ success: true }) };
+    const discordAdapter = { publish: jest.fn().mockResolvedValue({ success: true } as never) };
+    const linkedinAdapter = { publish: jest.fn().mockResolvedValue({ success: true } as never) };
     publisherManager.mockReturnValueOnce(discordAdapter).mockReturnValueOnce(linkedinAdapter);
 
     await processVariantJob({

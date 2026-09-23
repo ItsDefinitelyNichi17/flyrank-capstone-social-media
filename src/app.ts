@@ -42,7 +42,7 @@ worker.on('failed', (job, err) => {
   fs.appendFileSync(logPath, JSON.stringify(logFormat, null, 2));
   console.log(job, err);
 });
-app.use('/ingest', IngestRoute);
+app.use('/post', IngestRoute);
 app.use('/articles', ArticleRoute);
 app.use('/variant', VariantRoutes);
 app.listen(port, () => {
