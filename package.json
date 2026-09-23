@@ -5,11 +5,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:backend": "npm run start -w backend"
+    "start": "tsx src/app.ts",
+    "test:pub": "tsx services/publisher/publisher.ts"
   },
   "keywords": [],
   "type": "module",
   "dependencies": {
-    "typescript": "^7.0.2"
+    "@google/genai": "^2.19.0",
+    "bullmq": "^6.3.4",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.0",
+    "turndown": "^7.2.4"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.23.1",
+    "@types/turndown": "^5.0.6",
+    "tsx": "^4.23.12"
   }
 }

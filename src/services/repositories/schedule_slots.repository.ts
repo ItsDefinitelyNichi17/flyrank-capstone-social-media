@@ -109,8 +109,8 @@ export async function publishSlotWithLock(
     } catch (err: any) {
       const errMsg = err instanceof Error ? err.message : String(err);
       await client.query(
-        `UPDATE schedule_slots 
-         SET state = 'failed', last_error = $2, updated_at = NOW() 
+        `UPDATE schedule_slots
+         SET state = 'failed', last_error = $2, updated_at = NOW()
          WHERE id = $1`,
         [slot.id, errMsg]
       );
@@ -120,16 +120,16 @@ export async function publishSlotWithLock(
 
     if (publishRes.success) {
       await client.query(
-        `UPDATE schedule_slots 
-         SET state = 'published', last_error = NULL, updated_at = NOW() 
+        `UPDATE schedule_slots
+         SET state = 'published', last_error = NULL, updated_at = NOW()
          WHERE id = $1`,
         [slot.id]
       );
 
       // Also mark the variant status as published
       await client.query(
-        `UPDATE variants 
-         SET status = 'published', updated_at = NOW() 
+        `UPDATE variants
+         SET status = 'published', updated_at = NOW()
          WHERE id = $1`,
         [variantId]
       );
@@ -138,12 +138,15 @@ export async function publishSlotWithLock(
       return { success: true };
     } else {
       await client.query(
-        `UPDATE schedule_slots 
-         SET state = 'failed', last_error = $2, updated_at = NOW() 
+        `UPDATE schedule_slots
+         SET state = 'failed', last_error = $2, updated_at = NOW()
          WHERE id = $1`,
         [slot.id, publishRes.errorMessage || 'Publish failed']
       );
       await client.query('COMMIT');
+      if (!publishRes.errorMessage) {
+        return { success: false };
+      }
       return { success: false, errorMessage: publishRes.errorMessage };
     }
   } catch (error) {
@@ -206,9 +209,9 @@ export async function insertScheduleVariant(
      ON CONFLICT (variant_id)
      DO UPDATE SET
        scheduled_at = EXCLUDED.scheduled_at,
-       state = CASE 
-         WHEN schedule_slots.state = 'published' THEN 'published'::slotstate 
-         ELSE 'scheduled'::slotstate 
+       state = CASE
+         WHEN schedule_slots.state = 'published' THEN 'published'::slotstate
+         ELSE 'scheduled'::slotstate
        END,
        updated_at = NOW()
      RETURNING *`,
