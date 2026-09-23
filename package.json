@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand",
+    "test:services": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand src/services/test",
     "start": "tsx src/app.ts",
     "test:pub": "tsx services/publisher/publisher.ts"
   },
@@ -22,8 +23,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/pg": "^8.23.1",
     "@types/turndown": "^5.0.6",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.13",
     "tsx": "^4.23.12"
   }
 }

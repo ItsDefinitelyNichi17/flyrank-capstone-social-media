@@ -1,4 +1,13 @@
 # BUILDLOG
+
+## **Jest Test[Sep 22, 2026\]**
+* **About**:  
+  * Jest Test
+* **Challenges**:
+  * I dont know this service yet and not been learned it. I use Codex to generate the automated test using Jest. The lack of time in learning this sevice makes me lean towards using Codex. But will surely use this and learn it properly in the future.
+* **Where AI came in (Codex CLI)?**
+  * All passed
+  * ![assets/test.png](assets/test.png)
 ## **Changes to the Folder Structure[Sep 22, 2026\]**
 * **About**:  
   * removed the frontend folder to left the mono repo approach
