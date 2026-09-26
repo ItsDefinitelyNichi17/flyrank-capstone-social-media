@@ -3,7 +3,12 @@ import TurndownService from 'turndown'
 
 var turndownService = new TurndownService() // this service turns raw html as a markdown https://www.npmjs.com/package/turndown
 
-export async function storePost(content: string, type: string) {
+export async function getPostsQuery() {
+  const q = await pool.query(`SELECT * FROM posts`)
+  return q.rows
+}
+
+export async function storePostQuery(content: string, type: string) {
   const id = crypto.randomUUID()
   content = content.trim()
   const markdown = turndownService.turndown(content)

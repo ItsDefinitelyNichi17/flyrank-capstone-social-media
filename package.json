@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand",
-    "test:services": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand src/services/test",
+    "test:services": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand src/services/test/scheduling-and-publishing.test.ts",
     "start": "tsx src/app.ts",
-    "test:pub": "tsx services/publisher/publisher.ts"
+    "test:pub": "tsx src/services/publisher/publisher.ts",
+    "test:constraints": "NODE_OPTIONS=--experimental-vm-modules node ./node_modules/jest/bin/jest.js --runInBand src/services/test/variant.constraints.test.ts",
+    "test:idempotent": "tsx src/services/test/idempotent-publish.test.ts"
+
   },
   "keywords": [],
   "type": "module",

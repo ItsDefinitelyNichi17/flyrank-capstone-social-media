@@ -1,5 +1,9 @@
 # BUILDLOG
-
+## **Finalization [Sep 26, 2026\]**
+* **About**:  
+  * Create all neccesary documents and test cases
+* **Where AI came in (Codex CLI)?**
+  * Helped to generate test cases
 ## **Jest Test[Sep 22, 2026\]**
 * **About**:  
   * Jest Test

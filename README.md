@@ -38,4 +38,10 @@
 | PATCH  | /variant/status/:variant_id  | Change the variant status 'approved', 'rejected | JSON: {status: approve\|rejected post_id : UUID} |
 | POST   | /variant/schedule/:variantId | Schedule the variant                            | JSON: {schedule: Timestampz}                     |
 | GET    | /variant/schedule/           | Get all scheduled publish and queued variants   | n/a                                              |
-|        |                              |                                                 |                                                  |
+| GET    | /post/                       | Retrieve all post details                       | n/a                                               |
+
+## Architechture
+![](docs/assets/architechture.png)
+
+## Test Cases 
+[EVIDENCE.md: Check test cases here with JEST and some screenshots within yaak](docs/assets/EVIDENCE.md)

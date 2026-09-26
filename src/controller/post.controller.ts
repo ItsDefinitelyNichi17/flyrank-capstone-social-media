@@ -1,5 +1,5 @@
 import type { Response, Request } from "express";
-import { storePost } from "../services/repositories/post.repository.js";
+import { storePostQuery, getPostsQuery} from "../services/repositories/post.repository.js";
 import { genEachVarStore } from "../services/variant/variant.gen.js";
 import { storeVariant } from "../services/repositories/variant.repository.js";
 
@@ -10,7 +10,7 @@ export async function ingestPost(req : Request, res: Response) {
   if (isURL(content)) {
     const page_res = await fetch(content);
     const text = await page_res.text();
-    const post = await storePost(text, "url");
+    const post = await storePostQuery(text, "url");
 
     if (!post) {
       res.status(500).send("failed to store post")
@@ -44,6 +44,10 @@ export async function ingestPost(req : Request, res: Response) {
   }
 }
 
+export async function getPosts(req: Request, res: Response) {
+  const posts = await getPostsQuery()
+  res.status(200).json({ post: posts });
+}
 
 function isURL(url: string) {
   try {
