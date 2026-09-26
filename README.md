@@ -44,4 +44,4 @@
 ![](docs/assets/architechture.png)
 
 ## Test Cases 
-[EVIDENCE.md: Check test cases here with JEST and some screenshots within yaak](docs/assets/EVIDENCE.md)
+[EVIDENCE.md: Check test cases here with JEST and some screenshots within yaak](docs/EVIDENCE.md)
