@@ -4,11 +4,11 @@ A post enters as a URL or as Markdown, and is stored. Generation reads only the 
 ![](./assets/ingest.1.png)
 ![](./assets/ingest.2.png)
 ![](./assets/ingest.3.png)
-## * **Constraints**: 
+## **Constraints**: 
 length, tone rules, and hashtag count per platform. A test proves that a badvariant is blocked
   * `npm run test:constraints` <br>
 ![](./assets/constraints.png)
-## * **1 test 4 boxes**: 
+## **1 test 4 boxes**: 
 blocked variant, refused schedule, duplicate publish, adapter swap
   * `npm run test:services` <br>
 ![](./assets/4.png)
